@@ -22,6 +22,7 @@ report 50109 "Student Academic Summary"
         TotalMarks: Decimal;
         TotalMaximum: Decimal;
         AveragePercentage: Decimal;
+        testvar: Decimal;
     begin
         StudentRec.CopyFilters(Student);
         if StudentRec.FindSet() then
