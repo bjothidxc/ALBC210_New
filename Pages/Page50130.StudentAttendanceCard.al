@@ -1,4 +1,4 @@
-page 50111 "Student Attendance Card"
+page 50130 "Student Attendance Card"
 {
     Caption = 'Student Attendance Card';
     PageType = Card;

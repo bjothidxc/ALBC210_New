@@ -1,4 +1,4 @@
-pageextension 50110 "Student Business Manager Ext" extends "Business Manager Role Center"
+pageextension 50129 "Student Business Manager Ext" extends "Business Manager Role Center"
 {
     actions
     {

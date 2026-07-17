@@ -1,4 +1,4 @@
-report 50109 "Student Academic Summary"
+report 50128 "Student Academic Summary"
 {
     Caption = 'Student Academic Summary';
     UsageCategory = ReportsAndAnalysis;

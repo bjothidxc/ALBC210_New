@@ -1,4 +1,4 @@
-page 50107 "Student Academic List"
+page 50126 "Student Academic List"
 {
     Caption = 'Student Academics';
     PageType = List;
