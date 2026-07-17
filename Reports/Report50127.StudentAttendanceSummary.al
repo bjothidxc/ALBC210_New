@@ -1,4 +1,4 @@
-report 50108 "Student Attendance Summary"
+report 50127 "Student Attendance Summary"
 {
     Caption = 'Student Attendance Summary';
     UsageCategory = ReportsAndAnalysis;

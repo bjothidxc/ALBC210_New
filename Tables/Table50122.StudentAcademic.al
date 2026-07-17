@@ -1,4 +1,4 @@
-table 50103 "Student Academic"
+table 50122 "Student Academic"
 {
     Caption = 'Student Academic';
     DataClassification = CustomerContent;

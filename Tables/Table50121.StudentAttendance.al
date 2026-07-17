@@ -1,4 +1,4 @@
-table 50102 "Student Attendance"
+table 50121 "Student Attendance"
 {
     Caption = 'Student Attendance';
     DataClassification = CustomerContent;
