@@ -2,7 +2,7 @@
   "id": "7212654c-9ddf-46d1-88f7-d8f42ac5cac2",
   "name": "ALBC210",
   "publisher": "Bjothi",
-  "version": "1.0.0.0",
+  "version": "1.1.1.0",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -16,7 +16,7 @@
   "application": "21.0.0.0",
   "idRanges": [
     {
-      "from": 50100,
+      "from": 50120,
       "to": 50149
     }
   ],
