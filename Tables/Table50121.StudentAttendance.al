@@ -85,6 +85,7 @@ table 50121 "Student Attendance"
 
     trigger OnInsert()
     begin
+
         if "Attendance Date" = 0D then
             "Attendance Date" := WorkDate();
     end;
