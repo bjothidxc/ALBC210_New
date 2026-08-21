@@ -106,6 +106,26 @@ page 50124 "Student Card"
                     ToolTip = 'Specifies the guardian phone number.';
                 }
             }
+            group("Fee Calculation")
+            {
+                Caption = 'Fee Calculation';
+
+                field("Base Fee"; Rec."Base Fee")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the base fee before the selected fee policy is applied.';
+                }
+                field("Scholarship Discount %"; Rec."Scholarship Discount %")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the scholarship discount used by the scholarship fee policy.';
+                }
+                field("Fee Policy"; Rec."Fee Policy")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies which fee policy implementation calculates the student fee.';
+                }
+            }
         }
     }
 
@@ -130,6 +150,25 @@ page 50124 "Student Card"
                 RunObject = page "Student Academic List";
                 RunPageLink = "Student No." = field("No.");
                 ToolTip = 'Open academic entries for this student.';
+            }
+            action("Calculate Fee")
+            {
+                Caption = 'Calculate Fee';
+                ApplicationArea = All;
+                Image = Calculate;
+                ToolTip = 'Calculates the student fee by calling the selected fee policy interface implementation.';
+
+                trigger OnAction()
+                var
+                    FeePolicy: Interface iStudentfeepolicy;
+                    CalculatedFee: Decimal;
+                begin
+                    FeePolicy := Rec."Fee Policy";
+                    CalculatedFee := FeePolicy.CalculateFee(Rec);
+
+                    Message('Policy: %1\Rule: %2\Calculated Fee: %3',
+                        Format(Rec."Fee Policy"), FeePolicy.GetDescription(), CalculatedFee);
+                end;
             }
         }
     }

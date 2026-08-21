@@ -108,6 +108,24 @@ table 50120 "Student"
             CalcFormula = count("Student Academic" where("Student No." = field("No.")));
             Editable = false;
         }
+        field(19; "Base Fee"; Decimal)
+        {
+            Caption = 'Base Fee';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
+        field(20; "Scholarship Discount %"; Decimal)
+        {
+            Caption = 'Scholarship Discount %';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+            MaxValue = 100;
+        }
+        field(21; "Fee Policy"; Enum "Student Fee Policy Type")
+        {
+            Caption = 'Fee Policy';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

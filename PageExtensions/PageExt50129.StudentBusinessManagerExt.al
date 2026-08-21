@@ -48,6 +48,39 @@ pageextension 50129 "Student Business Manager Ext" extends "Business Manager Rol
                     ToolTip = 'Run the student academic summary report.';
                 }
             }
+
+            group("Transport Management")
+            {
+                Caption = 'Transport Management';
+                action("Transport Vehicles")
+                {
+                    Caption = 'Transport Vehicles';
+                    ApplicationArea = All;
+                    RunObject = page "Transport Vehicle List";
+                    ToolTip = 'Open the transport vehicle register.';
+                }
+                action("Transport Drivers")
+                {
+                    Caption = 'Transport Drivers';
+                    ApplicationArea = All;
+                    RunObject = page "Transport Driver List";
+                    ToolTip = 'Open the transport driver register.';
+                }
+                action("Transport Mechanics")
+                {
+                    Caption = 'Transport Mechanics';
+                    ApplicationArea = All;
+                    RunObject = page "Transport Mechanic List";
+                    ToolTip = 'Open the transport mechanic register.';
+                }
+                action("Transport Enrollment")
+                {
+                    Caption = 'Transport Enrollment';
+                    ApplicationArea = All;
+                    RunObject = page "Transport Enrollment List";
+                    ToolTip = 'Open school transport opt-in records.';
+                }
+            }
         }
     }
 }
