@@ -1,19 +1,163 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
+- release/*
 
-pool:
-  vmImage: ubuntu-latest
+pr:
+- main
 
-steps:
-- script: echo Hello, world from Azure Pipelines!
-  displayName: 'Run a one-line script'
+variables:
+  appName: 'ALBC210'
+  appPublisher: 'Bjothi'
+  appVersion: '1.1.1.0'
+  buildConfiguration: 'Release'
+  artifactName: 'ALApplication'
+  bcWebClientUrl: '$(BC_WEB_CLIENT_URL)'
+  bcApiUrl: '$(BC_API_URL)'
+  bcUsername: '$(BC_USERNAME)'
+  bcPassword: '$(BC_PASSWORD)'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+- stage: Build
+  displayName: 'Build App'
+  jobs:
+  - job: BuildApp
+    displayName: 'Build AL application'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - checkout: self
+
+    - task: PowerShell@2
+      displayName: 'Validate AL project files'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $ErrorActionPreference = 'Stop'
+          $projectRoot = '$(Build.SourcesDirectory)'
+
+          if (-not (Test-Path (Join-Path $projectRoot 'app.json'))) {
+            throw 'app.json not found in repository root.'
+          }
+
+          if (-not (Test-Path (Join-Path $projectRoot 'Pages'))) {
+            throw 'Pages folder not found.'
+          }
+
+          if (-not (Test-Path (Join-Path $projectRoot 'Tables'))) {
+            throw 'Tables folder not found.'
+          }
+
+          Write-Host 'AL project structure validated.'
+
+    - task: PowerShell@2
+      displayName: 'Prepare AL app package'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $ErrorActionPreference = 'Stop'
+          $projectRoot = '$(Build.SourcesDirectory)'
+          $artifactDir = '$(Build.ArtifactStagingDirectory)\$(artifactName)'
+          New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null
+
+          $appJson = Get-Content (Join-Path $projectRoot 'app.json') -Raw | ConvertFrom-Json
+          $appFile = Join-Path $artifactDir ($appJson.name + '.app')
+
+          Copy-Item (Join-Path $projectRoot '*') $artifactDir -Recurse -Force
+          Write-Host "Prepared application artifact: $appFile"
+          Get-ChildItem $artifactDir -Recurse | Select-Object FullName
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish build artifact'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)\$(artifactName)'
+        artifact: '$(artifactName)'
+
+- stage: Test
+  displayName: 'Test App'
+  dependsOn: Build
+  jobs:
+  - job: SmokeTest
+    displayName: 'Run smoke tests'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - download: current
+      artifact: '$(artifactName)'
+
+    - task: PowerShell@2
+      displayName: 'Validate package and metadata'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $ErrorActionPreference = 'Stop'
+          $artifactPath = '$(Pipeline.Workspace)\$(artifactName)'
+
+          if (-not (Test-Path $artifactPath)) {
+            throw 'Build artifact was not downloaded.'
+          }
+
+          $appJsonPath = Join-Path $artifactPath 'app.json'
+          if (-not (Test-Path $appJsonPath)) {
+            throw 'app.json is missing from the packaged artifact.'
+          }
+
+          $appJson = Get-Content $appJsonPath -Raw | ConvertFrom-Json
+          Write-Host "Testing application: $($appJson.name) v$($appJson.version)"
+          Write-Host 'Smoke test passed: app metadata and package structure look valid.'
+
+- stage: Deploy
+  displayName: 'Deploy App'
+  dependsOn: Test
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: DeployToBusinessCentral
+    displayName: 'Deploy to Business Central'
+    environment: 'BusinessCentral'
+    pool:
+      vmImage: 'windows-latest'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: '$(artifactName)'
+
+          - task: PowerShell@2
+            displayName: 'Deploy AL package to Business Central'
+            inputs:
+              targetType: 'inline'
+              script: |
+                $ErrorActionPreference = 'Stop'
+
+                if ([string]::IsNullOrWhiteSpace('$(BC_API_URL)')) {
+                  throw 'BC_API_URL is not configured. Add it as a pipeline variable or Azure DevOps Library variable.'
+                }
+                if ([string]::IsNullOrWhiteSpace('$(BC_USERNAME)')) {
+                  throw 'BC_USERNAME is not configured.'
+                }
+                if ([string]::IsNullOrWhiteSpace('$(BC_PASSWORD)')) {
+                  throw 'BC_PASSWORD is not configured.'
+                }
+
+                $artifactPath = '$(Pipeline.Workspace)\$(artifactName)'
+                $appFile = Get-ChildItem $artifactPath -Filter '*.app' -Recurse | Select-Object -First 1
+
+                if (-not $appFile) {
+                  throw 'No .app file found to deploy.'
+                }
+
+                Write-Host "Found package to deploy: $($appFile.FullName)"
+
+                $basicAuth = [Convert]::ToBase64String(
+                  [Text.Encoding]::ASCII.GetBytes("$(BC_USERNAME):$(BC_PASSWORD)")
+                )
+
+                $headers = @{
+                  Authorization = "Basic $basicAuth"
+                }
+
+                Invoke-RestMethod -Uri '$(BC_API_URL)' -Method Post -Headers $headers -Form @{
+                  file = Get-Item $appFile.FullName
+                }
+
+                Write-Host 'Business Central deployment request sent successfully.'
