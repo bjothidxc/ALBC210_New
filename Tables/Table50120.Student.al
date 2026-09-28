@@ -94,6 +94,11 @@ table 50120 "Student"
             ExtendedDatatype = PhoneNo;
             DataClassification = CustomerContent;
         }
+        field(19; Nationality; Text[50])
+        {
+            Caption = 'Nationality';
+            DataClassification = CustomerContent;
+        }
         field(17; "Attendance Entries"; Integer)
         {
             Caption = 'Attendance Entries';

@@ -38,6 +38,11 @@ page 50124 "Student Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the student gender.';
                 }
+                field(Nationality; Rec.Nationality)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the student nationality.';
+                }
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = All;

@@ -8,7 +8,7 @@ pr:
 variables:
   appName: 'ALBC210'
   appPublisher: 'Bjothi'
-  appVersion: '1.1.1.0'
+  appVersion: '1.1.1.1'
   buildConfiguration: 'Release'
   artifactName: 'ALApplication'
   bcWebClientUrl: '$(BC_WEB_CLIENT_URL)'

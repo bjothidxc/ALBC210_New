@@ -28,6 +28,11 @@ page 50123 "Student List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the student last name.';
                 }
+                field(Nationality; Rec.Nationality)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the student nationality.';
+                }
                 field("Class Code"; Rec."Class Code")
                 {
                     ApplicationArea = All;
