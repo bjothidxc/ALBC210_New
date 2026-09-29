@@ -126,6 +126,7 @@ stages:
             displayName: 'Deploy AL package to Business Central'
             inputs:
               targetType: 'inline'
+              pwsh: true
               script: |
                 $ErrorActionPreference = 'Stop'
 
